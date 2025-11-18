@@ -1,12 +1,13 @@
 package main
 
-import "github.com/jaxhemopo/pokedexcli/internal/pokeapi" 
+ 
 
 import (
 	"strings"
 	"bufio"
 	"fmt"
 	"os"
+	"github.com/jaxhemopo/pokedexcli/internal/pokeapi"
 )
 
 
@@ -36,7 +37,7 @@ func getCommands() map[string]cliCommand {
 			"mapb": {
 			name:			"mapb",
 			description:	"Displays the previous 20 location areas in Pokemon world",
-			callback: 		commandMap,
+			callback: 		commandMapb,
 		},
 	}
 }
@@ -51,10 +52,10 @@ func cleanInput(text string) []string {
 func commandMap(cfg *config, args []string) error {
 	res, err := pokeapi.GetLocationAreas(cfg.Next)
 	if err != nil {
-		fmt.Printf("error getting ocation areas")
+		fmt.Printf("error getting location areas")
 	}
 	for _,la := range res.Results {
-		fmt.Printf(la.Name)
+		fmt.Printf("%s\n", la.Name)
 	}
 
 	cfg.Next = res.Next
@@ -66,10 +67,10 @@ func commandMap(cfg *config, args []string) error {
 func commandMapb(cfg *config, args []string) error {
 	res, err := pokeapi.GetLocationAreas(cfg.Previous)
 	if err != nil {
-		fmt.Printf("error getting ocation areas")
+		fmt.Printf("error getting location areas")
 	}
 	for _,la := range res.Results {
-		fmt.Printf(la.Name)
+		fmt.Printf("%s\n", la.Name)
 	}
 
 	cfg.Next = res.Next

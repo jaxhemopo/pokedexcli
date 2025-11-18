@@ -1,9 +1,11 @@
 package main
 
-import "github.com/jaxhemopo/pokedexcli/internal/pokecache"
-
+import (
+	"github.com/jaxhemopo/pokedexcli/internal/pokecache"
+	"time"
+)
 type config struct {
-	Cache Cache 
+	Cache *pokecache.Cache 
 	Next string 
 	Previous string 
 }

@@ -1,59 +1,71 @@
 package pokecache
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
 
 type Cache struct {
-	entry map[string]cacheEntry
+	entries map[string]cacheEntry
 	mu sync.Mutex
 	interval time.Duration
 }
 
-type casheEntry struct {
+type cacheEntry struct {
 	createdAt time.Time
 	val []byte
 }
 
-func NewCache(t time.Duration) *Cache {
-	var C Cache {
-		interval: t,
+func NewCache(interval time.Duration) *Cache {
+	c := &Cache{
+		entries: make(map[string]cacheEntry),
+		interval: interval,
 	}
-	go reapLoop()
 
-	return C
-
+	go c.reapLoop()
+	return c
 }
 
-func (C *Cache) Add(key string, val []byte) error {
-	c.mu.Lock()
-	defer C.mu.Unlock()
-	c.entry[key] = val
-	fmt.Printf("added %s -> %v\n", key, val)
-	
-}
-
-func (c *cache) Get(key string, val []byte) ([]byte, bool) {
+func (c *Cache) Add(key string, val []byte) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	_,ok := c.etnry[key]
+	c.entries[key] = cacheEntry{
+		createdAt: time.Now(),
+		val: val,
+	}
+
+}
+
+func (c *Cache) Get(key string) ([]byte, bool){
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	entry, ok := c.entries[key]
 	if !ok {
-		return []byte, false
+		return nil, false
 	} else {
-		return c.entry[key].val, true
+		return entry.val, true
 	}
 }
 
-func (c *cache) reapLoop(){
-	c.mu.Lock()
+func (c *Cache) reapLoop(){
+	ticker := time.NewTicker(c.interval)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		c.reap()
+	}
+}
+
+func (c *Cache) reap(){
+	c.mu.Lock()		
 	defer c.mu.Unlock()
-	for _,i := range c.etnry{
-		dif := time.Time - createdAt
-		if dif > c.interval {
-			delete(i, c.entry)
+
+	now := time.Now()
+	for key,entry := range c.entries {
+		if now.Sub(entry.createdAt) > c.interval {
+			delete(c.entries, key)
 		}
 	}
-	return
+
 }

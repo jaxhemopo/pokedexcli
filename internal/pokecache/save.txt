@@ -1,0 +1,51 @@
+type Cache struct {
+	entry map[string]cacheEntry
+	mu sync.Mutex
+	interval time.Duration
+}
+
+type casheEntry struct {
+	createdAt time.Time
+	val []byte
+}
+
+func NewCache(t time.Duration) *Cache {
+	var C Cache {
+		interval: t,
+	}
+	go reapLoop()
+
+	return C
+
+}
+
+func (C *Cache) Add(key string, val []byte) error {
+	c.mu.Lock()
+	defer C.mu.Unlock()
+	c.entry[key] = val
+	fmt.Printf("added %s -> %v\n", key, val)
+	
+}
+
+func (C *Cache) Get(key string, val []byte) ([]byte, bool) {
+	C.mu.Lock()
+	defer C.mu.Unlock()
+	_,ok := C.etnry[key]
+	if !ok {
+		return []byte, false
+	} else {
+		return C.entry[key].val, true
+	}
+}
+
+func (C *Cache) reapLoop(){
+	C.mu.Lock()
+	defer C.mu.Unlock()
+	for _,i := range C.etnry{
+		dif := time.Time - createdAt
+		if dif > C.interval {
+			delete(i, C.entry)
+		}
+	}
+	return
+}
